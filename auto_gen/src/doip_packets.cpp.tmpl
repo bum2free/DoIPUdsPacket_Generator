@@ -1,0 +1,227 @@
+#include <algorithm>
+#include <arpa/inet.h>
+#include "doip_packets.h"
+#include <exception>
+#include <string.h>
+
+/***********************Doip_Packet****************************/
+Doip_Packet::Doip_Packet(uint8_t *buf, uint32_t length)
+{
+    if (length < exp_payloadLength)
+    {
+        throw std::runtime_error("Bad doip packet");
+    }
+    buffer = new std::vector<uint8_t>(length);
+    memcpy(buffer->data(), buf, length);
+    deserialize();
+}
+
+Doip_Packet::Doip_Packet(Doip_Packet&& packet)
+{
+    protocol_version = packet.protocol_version;
+    protocol_version_inv = packet.protocol_version_inv;
+    payloadType = packet.payloadType;
+    payloadLength = packet.payloadLength;
+    parse_index = packet.parse_index;
+    buffer = packet.buffer;
+    packet.buffer = nullptr;
+}
+
+Doip_Packet::~Doip_Packet()
+{
+    if (buffer != nullptr)
+    {
+        delete buffer;
+    }
+}
+
+int Doip_Packet::deserialize(void)
+{
+    //TBD: simple header validity check
+    parse_index = 0;
+    auto raw_buf = buffer->data();
+    protocol_version = raw_buf[parse_index++]; 
+    protocol_version_inv = raw_buf[parse_index++];
+    payloadType = ntohs(*(uint16_t *)(raw_buf + parse_index));
+    parse_index += 2;
+    payloadLength = ntohl(*(uint32_t *)(raw_buf + parse_index));
+    parse_index += 4;
+    return 0;
+}
+
+int Doip_Packet::serialize(void)
+{
+    if (buffer == nullptr)
+    {
+        buffer = new std::vector<uint8_t>(payloadLength + 8);
+    }
+    else
+    {
+        buffer->resize(payloadLength + 8);
+    }
+    parse_index = 0;
+    auto raw_buf = buffer->data();
+    raw_buf[parse_index++] = protocol_version;
+    raw_buf[parse_index++] = protocol_version_inv;
+    *(uint16_t *)(raw_buf + parse_index) = htons(payloadType);
+    parse_index += 2;
+    *(uint32_t *)(raw_buf + parse_index) = htonl(payloadLength);
+    parse_index += 4;
+    return 0;
+}
+
+% for packet in s_packets:
+/*
+ * Packet: ${packet["name"]}
+ */
+<%
+context_packets[packet["name"]] = packet
+%>
+${packet["name"]}::${packet["name"]}(
+## construct parent's constructor's argument list
+    % if packet["parent"] in context_packets:
+        % for element in context_packets[packet["parent"]]["elements"]:
+    ${element["type"]} ${'&&' if element["type"]=="std::vector<uint8_t>" else ''}${element["name"]},
+        % endfor
+    % endif
+## construct constructor's argument list
+    % for element in packet["elements"]:
+    ${element["type"]} ${'&&' if element["type"]=="std::vector<uint8_t>" else ''}${element["name"]}\
+${',' if loop.last==False else ') :'}
+    % endfor
+## variable initialization list started here
+## construct parent's constructor's argument list
+    % if packet["parent"] in context_packets:
+    ${packet["parent"]}(\
+        % for element in context_packets[packet["parent"]]["elements"]:
+${element["name"]}\
+${', ' if loop.last==False else ''}\
+        % endfor
+),
+    % endif
+## construct constructor's argument list
+    % for element in packet["elements"]:
+    ${element["name"]}(${element["name"]})\
+${',' if loop.last==False else ''}
+    % endfor
+{
+% if "payloadType" in packet:
+    payloadType = ${packet["payloadType"]};
+% endif
+    payloadLength += exp_payloadLength;
+}
+
+${packet["name"]}::${packet["name"]}(${packet["name"]} &&packet) :
+    ${packet["parent"]}(std::forward<${packet["parent"]}>(packet))
+{
+% for element in packet["elements"]:
+    ${element["name"]} = packet.${element["name"]};
+% endfor
+}
+
+${packet["name"]}::${packet["name"]}(${packet["parent"]} &&packet) :
+    ${packet["parent"]}(std::forward<${packet["parent"]}>(packet))
+{
+    if (buffer->size() - parse_index < exp_payloadLength)
+    {
+        throw std::runtime_error("Bad ${packet["name"]}");
+    }
+    deserialize();
+}
+
+
+int ${packet["name"]}::deserialize(void)
+{
+    auto raw_buf = buffer->data();
+% for element in packet["elements"]:
+
+    % if element["type"]=="std::vector<uint8_t>":
+        % if element["length"] != 0:
+    ${element["name"]}.assign(buffer->begin() + parse_index, buffer->begin() +
+            parse_index + ${element["length"]});
+    parse_index += ${element["length"]};
+        % else:
+    ${element["name"]}.assign(buffer->begin() + parse_index, buffer->end());
+    parse_index += buffer->size() - parse_index;
+        % endif
+    % elif element["type"]=="uint32_t":
+    ${element["name"]} = ntohl(*(uint32_t *)(raw_buf + parse_index));
+    parse_index += 4;
+    % elif element["type"]=="uint16_t":
+    ${element["name"]} = ntohs(*(uint16_t *)(raw_buf + parse_index));
+    parse_index += 2;
+    % else:
+    ${element["name"]} = raw_buf[parse_index++];
+    % endif
+% endfor
+
+    return 0;
+}
+
+int ${packet["name"]}::serialize(void)
+{
+% for element in packet["elements"]:
+    % if element["type"]=="std::vector<uint8_t>":
+        % if element["length"] == 0:
+    payloadLength += ${element["name"]}.size();
+
+        % endif
+    % endif
+% endfor
+    ${packet["parent"]}::serialize();
+    auto raw_buf = buffer->data();
+% for element in packet["elements"]:
+
+    % if element["type"]=="std::vector<uint8_t>":
+        % if element["length"] != 0:
+    memcpy(raw_buf + parse_index, ${element["name"]}.data(), std::min(${element["length"]}, (int)${element["name"]}.size()));
+    parse_index += ${element["length"]};
+        % else:
+    memcpy(raw_buf + parse_index, ${element["name"]}.data(), ${element["name"]}.size());
+    parse_index += ${element["name"]}.size();
+        % endif
+    % elif element["type"]=="uint32_t":
+    *(uint32_t *)(raw_buf + parse_index) = htonl(${element["name"]});
+    parse_index += 4;
+    % elif element["type"]=="uint16_t":
+    *(uint16_t *)(raw_buf + parse_index) = htons(${element["name"]});
+    parse_index += 2;
+    % else:
+    raw_buf[parse_index++] = ${element["name"]};
+    % endif
+% endfor
+
+    return 0;
+}
+
+% endfor
+
+#if 0
+//TBD: non-auto generated code:
+Uds_ReadDataByIdPosRes_Packet::Uds_ReadDataByIdPosRes_Packet(
+    uint16_t source_addr,
+    uint16_t target_addr,
+    uint8_t request_sid,
+    uint16_t did,
+    std::vector<uint8_t> &&data) :
+    Uds_Packet(source_addr, target_addr, request_sid),
+    did(did),
+    data(data)
+{
+    payloadLength += exp_payloadLength + data.size();
+}
+
+int Uds_ReadDataByIdPosRes_Packet::serialize(void)
+{
+    Uds_Packet::serialize();
+    auto raw_buf = buffer->data();
+
+    *(uint16_t *)(raw_buf + parse_index) = htons(did);
+    parse_index += 2;
+    data.assign(buffer->begin() + parse_index, buffer->begin() +
+            parse_index + data.size());
+    parse_index += data.size();
+
+    return 0;
+}
+#endif

@@ -1,0 +1,365 @@
+---
+packets:
+    - name: Doip_NegAck_Packet
+      parent: Doip_Packet
+      payloadType: 0x0000
+      elements:
+          - name: code
+            type: uint8_t
+            length: 1
+    - name: Doip_VehicleReqEid_Packet
+      parent: Doip_Packet
+      payloadType: 0x0002
+      elements:
+          - name: eid
+            type: "std::vector<uint8_t>"
+            length: 6
+    - name: Doip_VehicleReqVin_Packet
+      parent: Doip_Packet
+      payloadType: 0x0003
+      elements:
+          - name: vin
+            type: "std::vector<uint8_t>"
+            length: 17
+    - name: Doip_VehicleResponse_Packet
+      parent: Doip_Packet
+      payloadType: 0x0004
+      elements:
+          - name: vin
+            type: "std::vector<uint8_t>"
+            length: 17
+          - name: addr
+            type: uint16_t
+            length: 2
+          - name: eid
+            type: "std::vector<uint8_t>"
+            length: 6
+          - name: gid
+            type: "std::vector<uint8_t>"
+            length: 6
+          - name: reserved
+            type: uint8_t
+            length: 1
+          - name: sync_state
+            type: uint8_t
+            length: 1
+    - name: Doip_RoutingActivateRequest_Packet
+      parent: Doip_Packet
+      payloadType: 0x0005
+      elements:
+          - name: source_addr
+            type: "uint16_t"
+            length: 2
+          - name: activate_type
+            type: "uint8_t"
+            length: 1
+          - name: reserved_iso
+            type: "uint32_t"
+            length: 4
+    - name: Doip_RoutingActivateResponse_Packet
+      parent: Doip_Packet
+      payloadType: 0x0006
+      elements:
+          - name: test_addr
+            type: "uint16_t"
+            length: 2
+          - name: doip_addr
+            type: "uint16_t"
+            length: 2
+          - name: res_code
+            type: "uint8_t"
+            length: 1
+          - name: reserved_iso
+            type: "uint32_t"
+            length: 4
+    - name: Doip_EntityStatusResponse_Packet
+      parent: Doip_Packet
+      payloadType: 0x4002
+      elements:
+          - name: node_type
+            type: "uint8_t"
+            length: 1
+          - name: max_current_tcp
+            type: "uint8_t"
+            length: 1
+          - name: max_open_tcp
+            type: "uint8_t"
+            length: 1
+          - name: max_data_size
+            type: "uint32_t"
+            length: 4
+    - name: Doip_PowerModeResponse_Packet
+      parent: Doip_Packet
+      payloadType: 0x4004
+      elements:
+          - name: mode
+            type: "uint8_t"
+            length: 1
+    - name: Uds_Packet
+      parent: Doip_Packet
+      payloadType: 0x8001
+      elements:
+          - name: source_addr
+            type: "uint16_t"
+            length: 2
+          - name: target_addr
+            type: "uint16_t"
+            length: 2
+          - name: request_sid
+            type: "uint8_t"
+            length: 1
+    - name: Doip_Uds_Packet_Pos_Ack
+      parent: Doip_Packet
+      payloadType: 0x8002
+      elements:
+          - name: source_addr
+            type: "uint16_t"
+            length: 2
+          - name: target_addr
+            type: "uint16_t"
+            length: 2
+          - name: ack_code
+            type: "uint8_t"
+            length: 1
+    - name: Doip_Uds_Packet_Neg_Ack
+      parent: Doip_Packet
+      payloadType: 0x8003
+      elements:
+          - name: source_addr
+            type: "uint16_t"
+            length: 2
+          - name: target_addr
+            type: "uint16_t"
+            length: 2
+          - name: nack_code
+            type: "uint8_t"
+            length: 1
+    - name: Uds_NegResponse_Packet
+      parent: Uds_Packet
+      elements:
+          - name: service_code
+            type: "uint8_t"
+            length: 1
+          - name: res_code
+            type: "uint8_t"
+            length: 1
+    - name: Uds_DiagSessionControl_Packet
+      parent: Uds_Packet
+      elements:
+          - name: type
+            type: "uint8_t"
+            length: 1
+          - name: record
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_EcuReset_Packet
+      parent: Uds_Packet
+      elements:
+          - name: reset_type
+            type: "uint8_t"
+            length: 1
+    - name: Uds_EcuResetPosRes_Packet
+      parent: Uds_Packet
+      elements:
+          - name: reset_type
+            type: "uint8_t"
+            length: 1
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_SecurityAccess_Packet
+      parent: Uds_Packet
+      elements:
+          - name: type
+            type: "uint8_t"
+            length: 1
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_SecurityAccessPosRes_Packet
+      parent: Uds_Packet
+      elements:
+          - name: type
+            type: "uint8_t"
+            length: 1
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_ReadDataById_Packet
+      parent: Uds_Packet
+      elements:
+          - name: did
+            type: "uint16_t"
+            length: 2
+    - name: Uds_ReadDataByIdPosRes_Packet
+      parent: Uds_Packet
+      elements:
+          - name: did
+            type: "uint16_t"
+            length: 2
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_WriteDataById_Packet
+      parent: Uds_Packet
+      elements:
+          - name: did
+            type: "uint16_t"
+            length: 2
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_WriteDataByIdPosRes_Packet
+      parent: Uds_Packet
+      elements:
+          - name: did
+            type: "uint16_t"
+            length: 2
+    - name: Uds_RoutingControl_Packet
+      parent: Uds_Packet
+      elements:
+          - name: type
+            type: "uint8_t"
+            length: 1
+          - name: id
+            type: "uint16_t"
+            length: 2
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_RoutingControlPosRes_Packet
+      parent: Uds_Packet
+      elements:
+          - name: type
+            type: "uint8_t"
+            length: 1
+          - name: id
+            type: "uint16_t"
+            length: 2
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_RequestDownload_Packet
+      parent: Uds_Packet
+      elements:
+          - name: data_id
+            type: "uint8_t"
+            length: 1
+          - name: format_id
+            type: "uint8_t"
+            length: 1
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_RequestDownloadPosRes_Packet
+      parent: Uds_Packet
+      elements:
+          - name: format_id
+            type: "uint8_t"
+            length: 1
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_TransferData_Packet
+      parent: Uds_Packet
+      elements:
+          - name: block_cnt
+            type: "uint8_t"
+            length: 1
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_TransferDataPosRes_Packet
+      parent: Uds_Packet
+      elements:
+          - name: block_cnt
+            type: "uint8_t"
+            length: 1
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_RequestTransferExit_Packet
+      parent: Uds_Packet
+      elements:
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_RequestTransferExitPosRes_Packet
+      parent: Uds_Packet
+      elements:
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_RequestFileTransfer_Packet
+      parent: Uds_Packet
+      elements:
+          - name: modeOfOperation
+            type: "uint8_t"
+            length: 1
+          - name: filePathAndNameLength
+            type: "uint16_t"
+            length: 2
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_RequestFileTransferPosRes_Packet
+      parent: Uds_Packet
+      elements:
+          - name: modeOfOperation
+            type: "uint8_t"
+            length: 1
+          - name: lengthFormatIdentifier
+            type: "uint8_t"
+            length: 1
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_TesterPresent_Packet
+      parent: Uds_Packet
+      elements:
+          - name: zero
+            type: "uint8_t"
+            length: 1
+    - name: Uds_TesterPresentPosRes_Packet
+      parent: Uds_Packet
+      elements:
+          - name: zero
+            type: "uint8_t"
+            length: 1
+    - name: Uds_ReadDtc_Packet
+      parent: Uds_Packet
+      elements:
+          - name: reportType
+            type: "uint8_t"
+            length: 1
+          - name: buf
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_ClearDtc_Packet
+      parent: Uds_Packet
+      elements:
+          - name: group
+            type: "std::vector<uint8_t>"
+            length: 3
+    - name: Uds_ControlDtc_Packet
+      parent: Uds_Packet
+      elements:
+          - name: type
+            type: "uint8_t"
+            length: 1
+          - name: record
+            type: "std::vector<uint8_t>"
+            length: 0
+    - name: Uds_CommunicationControl_Packet
+      parent: Uds_Packet
+      elements:
+          - name: controlType
+            type: "uint8_t"
+            length: 1
+          - name: communicationType
+            type: "uint8_t"
+            length: 1
+          - name: nodeIdNumber
+            type: "std::vector<uint8_t>"
+            length: 0
+...
