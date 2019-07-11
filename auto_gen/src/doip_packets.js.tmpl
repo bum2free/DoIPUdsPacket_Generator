@@ -74,6 +74,9 @@ var ${packet["name"]} = function (
     % for element in packet["elements"]:
 	this.${element["name"]} = ${element["name"]}
 	% endfor
+  % if "payloadType" in packet:
+    this.payloadType = ${packet["payloadType"]}
+  % endif
 }
 ${packet["name"]}.prototype.__proto__ = ${packet["parent"]}.prototype
 ${packet["name"]}.prototype.serialize = function (len = 0) {

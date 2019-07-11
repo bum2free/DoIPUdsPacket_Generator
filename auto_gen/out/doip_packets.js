@@ -51,6 +51,7 @@ var Doip_NegAck_Packet = function (
 	Doip_Packet.call(this)
 
 	this.code = code
+    this.payloadType = 0
 }
 Doip_NegAck_Packet.prototype.__proto__ = Doip_Packet.prototype
 Doip_NegAck_Packet.prototype.serialize = function (len = 0) {
@@ -87,6 +88,7 @@ var Doip_VehicleReqEid_Packet = function (
 	Doip_Packet.call(this)
 
 	this.eid = eid
+    this.payloadType = 2
 }
 Doip_VehicleReqEid_Packet.prototype.__proto__ = Doip_Packet.prototype
 Doip_VehicleReqEid_Packet.prototype.serialize = function (len = 0) {
@@ -125,6 +127,7 @@ var Doip_VehicleReqVin_Packet = function (
 	Doip_Packet.call(this)
 
 	this.vin = vin
+    this.payloadType = 3
 }
 Doip_VehicleReqVin_Packet.prototype.__proto__ = Doip_Packet.prototype
 Doip_VehicleReqVin_Packet.prototype.serialize = function (len = 0) {
@@ -173,6 +176,7 @@ var Doip_VehicleResponse_Packet = function (
 	this.gid = gid
 	this.reserved = reserved
 	this.sync_state = sync_state
+    this.payloadType = 4
 }
 Doip_VehicleResponse_Packet.prototype.__proto__ = Doip_Packet.prototype
 Doip_VehicleResponse_Packet.prototype.serialize = function (len = 0) {
@@ -244,6 +248,7 @@ var Doip_RoutingActivateRequest_Packet = function (
 	this.source_addr = source_addr
 	this.activate_type = activate_type
 	this.reserved_iso = reserved_iso
+    this.payloadType = 5
 }
 Doip_RoutingActivateRequest_Packet.prototype.__proto__ = Doip_Packet.prototype
 Doip_RoutingActivateRequest_Packet.prototype.serialize = function (len = 0) {
@@ -296,6 +301,7 @@ var Doip_RoutingActivateResponse_Packet = function (
 	this.doip_addr = doip_addr
 	this.res_code = res_code
 	this.reserved_iso = reserved_iso
+    this.payloadType = 6
 }
 Doip_RoutingActivateResponse_Packet.prototype.__proto__ = Doip_Packet.prototype
 Doip_RoutingActivateResponse_Packet.prototype.serialize = function (len = 0) {
@@ -353,6 +359,7 @@ var Doip_EntityStatusResponse_Packet = function (
 	this.max_current_tcp = max_current_tcp
 	this.max_open_tcp = max_open_tcp
 	this.max_data_size = max_data_size
+    this.payloadType = 16386
 }
 Doip_EntityStatusResponse_Packet.prototype.__proto__ = Doip_Packet.prototype
 Doip_EntityStatusResponse_Packet.prototype.serialize = function (len = 0) {
@@ -404,6 +411,7 @@ var Doip_PowerModeResponse_Packet = function (
 	Doip_Packet.call(this)
 
 	this.mode = mode
+    this.payloadType = 16388
 }
 Doip_PowerModeResponse_Packet.prototype.__proto__ = Doip_Packet.prototype
 Doip_PowerModeResponse_Packet.prototype.serialize = function (len = 0) {
@@ -444,6 +452,7 @@ var Uds_Packet = function (
 	this.source_addr = source_addr
 	this.target_addr = target_addr
 	this.request_sid = request_sid
+    this.payloadType = 32769
 }
 Uds_Packet.prototype.__proto__ = Doip_Packet.prototype
 Uds_Packet.prototype.serialize = function (len = 0) {
@@ -494,6 +503,7 @@ var Doip_Uds_Packet_Pos_Ack = function (
 	this.source_addr = source_addr
 	this.target_addr = target_addr
 	this.ack_code = ack_code
+    this.payloadType = 32770
 }
 Doip_Uds_Packet_Pos_Ack.prototype.__proto__ = Doip_Packet.prototype
 Doip_Uds_Packet_Pos_Ack.prototype.serialize = function (len = 0) {
@@ -544,6 +554,7 @@ var Doip_Uds_Packet_Neg_Ack = function (
 	this.source_addr = source_addr
 	this.target_addr = target_addr
 	this.nack_code = nack_code
+    this.payloadType = 32771
 }
 Doip_Uds_Packet_Neg_Ack.prototype.__proto__ = Doip_Packet.prototype
 Doip_Uds_Packet_Neg_Ack.prototype.serialize = function (len = 0) {
