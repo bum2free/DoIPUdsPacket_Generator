@@ -1,0 +1,7 @@
+{
+    "author": "Eric",
+    "name": "test js doip packet",
+    "dependencies": {
+        "hexdump-nodejs": "^0.1.0"
+    }
+}

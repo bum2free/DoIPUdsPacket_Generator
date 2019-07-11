@@ -1,0 +1,154 @@
+var Doip_Packet = function () {
+  this.version = 0x2;
+  this.version_inv = 0xfd;
+  this.payloadType = 0x0;
+  this.payloadLength = 0x0;
+}
+
+Doip_Packet.prototype.serialize = function (len){
+  var parse_index = 0;
+  var buffer = Buffer.alloc(len + 8)
+
+  this.payloadLength = len
+
+  buffer.writeUInt8(this.version, parse_index)
+  parse_index += 1
+  buffer.writeUInt8(this.version_inv, parse_index)
+  parse_index += 1
+  buffer.writeUInt16BE(this.payloadType, parse_index)
+  parse_index += 2
+  buffer.writeUInt32BE(this.payloadLength, parse_index)
+  parse_index += 4
+
+  this.parse_index = parse_index;
+  this.buffer = buffer
+}
+Doip_Packet.prototype.deserialize = function (buffer) {
+  var parse_index = 0;
+  this.version = buffer.readUInt8(parse_index)
+  parse_index += 1
+  this.version_inv = buffer.readUInt8(parse_index)
+  parse_index += 1
+  this.payloadType = buffer.readUInt16BE(parse_index)
+  parse_index += 2
+  this.payloadLength = buffer.readUInt32BE(parse_index)
+  parse_index += 4
+
+  this.parse_index = parse_index;
+  this.buffer = buffer;
+}
+Doip_Packet.prototype.createFromBuffer = function (buffer) {
+  var obj = {}
+  Doip_Packet.prototype.deserialize.call(obj, buffer)
+  return obj
+}
+module.exports.Doip_Packet = Doip_Packet
+
+% for packet in s_packets:
+<%
+context_packets[packet["name"]] = packet
+%>
+////////////////Packet: ${packet["name"]}////////////////
+var ${packet["name"]} = function (
+## construct parent's constructor's argument list
+    % if packet["parent"] in context_packets:
+        % for element in context_packets[packet["parent"]]["elements"]:
+	${element["name"]},
+		% endfor
+    % endif
+## construct constructor's argument list
+    % for element in packet["elements"]:
+	${element["name"]}${',' if loop.last==False else ') {'}
+	% endfor
+## construct parent's constructor's argument list
+    % if packet["parent"] in context_packets:
+	${packet["parent"]}.call(this,
+        % for element in context_packets[packet["parent"]]["elements"]:
+	${element["name"]}${',' if loop.last==False else ')'}
+		% endfor
+	% else:
+	${packet["parent"]}.call(this)
+    % endif
+
+## construct constructor's argument list
+    % for element in packet["elements"]:
+	this.${element["name"]} = ${element["name"]}
+	% endfor
+}
+${packet["name"]}.prototype.__proto__ = ${packet["parent"]}.prototype
+${packet["name"]}.prototype.serialize = function (len = 0) {
+	var ele_len = len;
+    % for element in packet["elements"]:
+		% if element["type"]=="std::vector<uint8_t>" :
+	if (this.${element["name"]} != null) {
+		ele_len += this.${element["name"]}.length
+	}
+		% else :
+	ele_len += ${element["length"]}
+		% endif
+	% endfor
+	${packet["parent"]}.prototype.serialize.call(this, ele_len)
+
+	var buffer = this.buffer;
+	var parse_index = this.parse_index
+
+    % for element in packet["elements"]:
+		% if element["type"]=="std::vector<uint8_t>" :
+			% if element["length"] == 0 :
+	if (this.${element["name"]} != null) {
+		buffer.copy(this.${element["name"]}, parse_index)
+		parse_index += this.${element["name"]}.length
+	}
+			% else:
+	buffer.copy(this.${element["name"]}, parse_index)
+	parse_index += ${element["length"]}
+			% endif
+		% else :
+			% if element["length"] == 1:
+	buffer.writeUInt8(this.${element["name"]}, parse_index)
+			% elif element["length"] == 2:
+	buffer.writeUInt16BE(this.${element["name"]}, parse_index)
+			% elif element["length"] == 4:
+	buffer.writeUInt32BE(this.${element["name"]}, parse_index)
+			% endif
+	parse_index += ${element["length"]}
+		% endif
+	% endfor
+	this.parse_index = parse_index
+}
+${packet["name"]}.prototype.deserialize = function () {
+	var parse_index = this.parse_index
+	var buffer = this.buffer
+
+    % for element in packet["elements"]:
+		% if element["type"]=="std::vector<uint8_t>" :
+			% if element["length"] == 0 :
+	if (parse_index < buffer.length) {
+		this.${element["name"]} = Buffer.from(buffer, parse_index)
+		parse_index += this.${element["name"]}.length
+	}
+			% else:
+	this.${element["name"]} = Buffer.from(buffer, parse_index, ${element["length"]})
+	parse_index += ${element["length"]}
+			% endif
+		% else :
+			% if element["length"] == 1:
+	this.${element["name"]} = buffer.readUInt8(parse_index)
+			% elif element["length"] == 2:
+	this.${element["name"]} = buffer.readUInt16BE(parse_index)
+			% elif element["length"] == 4:
+	this.${element["name"]} = buffer.readUInt32BE(parse_index)
+			% endif
+	parse_index += ${element["length"]}
+		% endif
+	% endfor
+	this.parse_index = parse_index
+}
+${packet["name"]}.prototype.createFrom${packet["parent"]} = function (packet) {
+	${packet["name"]}.prototype.deserialize.call(packet)
+	packet.__proto__ = ${packet["name"]}.prototype
+	return packet
+}
+
+module.exports.${packet["name"]} = ${packet["name"]}
+% endfor

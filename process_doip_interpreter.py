@@ -24,7 +24,7 @@ with open(os.path.join(basePath, "./auto_gen/src/doip_packets.yml"), 'r') as pac
     try:
         y_packets = yaml.load(packets)
         # generate doip packets class
-        file_temp = ['doip_packets.h.tmpl', 'doip_packets.cpp.tmpl']
+        file_temp = ['doip_packets.h.tmpl', 'doip_packets.cpp.tmpl', 'doip_packets.js.tmpl']
         generate_doip_packets(basePath, file_temp, y_packets)
     except yaml.YAMLError as exc:
         print(exc)

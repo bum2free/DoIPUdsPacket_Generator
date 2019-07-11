@@ -13,3 +13,5 @@ DoIP/Uds packet description, based on ISO-13400 and ISO-14229
 - auto_gen/src/doip_packets.cpp.tmpl
 - auto_gen/src/doip_packets.h.tmpl
 c++ code template
+- auto_gen/src/doip_packets.js.tmpl
+js code template
