@@ -127,7 +127,9 @@ ${packet["name"]}.prototype.deserialize = function () {
 		% if element["type"]=="std::vector<uint8_t>" :
 			% if element["length"] == 0 :
 	if (parse_index < buffer.length) {
-		this.${element["name"]} = Buffer.from(buffer, parse_index)
+        var buf_len = buffer.length - parse_index
+		this.${element["name"]} = Buffer.alloc(buf_len)
+		buffer.copy(this.${element["name"]}, 0, parse_index)
 		parse_index += this.${element["name"]}.length
 	}
 			% else:
