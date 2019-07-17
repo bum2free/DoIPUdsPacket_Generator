@@ -893,6 +893,68 @@ int Uds_DiagSessionControl_Packet::serialize(void)
 }
 
 /*
+ * Packet: Uds_DiagSessionControlPosRes_Packet
+ */
+
+Uds_DiagSessionControlPosRes_Packet::Uds_DiagSessionControlPosRes_Packet(
+    uint16_t source_addr,
+    uint16_t target_addr,
+    uint8_t request_sid,
+    uint8_t type,
+    std::vector<uint8_t> &&record) :
+    Uds_Packet(source_addr, target_addr, request_sid),
+    type(type),
+    record(record)
+{
+    payloadLength += exp_payloadLength;
+}
+
+Uds_DiagSessionControlPosRes_Packet::Uds_DiagSessionControlPosRes_Packet(Uds_DiagSessionControlPosRes_Packet &&packet) :
+    Uds_Packet(std::forward<Uds_Packet>(packet))
+{
+    type = packet.type;
+    record = packet.record;
+}
+
+Uds_DiagSessionControlPosRes_Packet::Uds_DiagSessionControlPosRes_Packet(Uds_Packet &&packet) :
+    Uds_Packet(std::forward<Uds_Packet>(packet))
+{
+    if (buffer->size() - parse_index < exp_payloadLength)
+    {
+        throw std::runtime_error("Bad Uds_DiagSessionControlPosRes_Packet");
+    }
+    deserialize();
+}
+
+
+int Uds_DiagSessionControlPosRes_Packet::deserialize(void)
+{
+    auto raw_buf = buffer->data();
+
+    type = raw_buf[parse_index++];
+
+    record.assign(buffer->begin() + parse_index, buffer->end());
+    parse_index += buffer->size() - parse_index;
+
+    return 0;
+}
+
+int Uds_DiagSessionControlPosRes_Packet::serialize(void)
+{
+    payloadLength += record.size();
+
+    Uds_Packet::serialize();
+    auto raw_buf = buffer->data();
+
+    raw_buf[parse_index++] = type;
+
+    memcpy(raw_buf + parse_index, record.data(), record.size());
+    parse_index += record.size();
+
+    return 0;
+}
+
+/*
  * Packet: Uds_EcuReset_Packet
  */
 

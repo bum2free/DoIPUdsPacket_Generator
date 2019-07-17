@@ -674,7 +674,7 @@ Uds_DiagSessionControl_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.type, parse_index)
 	parse_index += 1
 	if (this.record != null) {
-		buffer.copy(this.record, parse_index)
+		this.record.copy(buffer, parse_index)
 		parse_index += this.record.length
 	}
 	this.parse_index = parse_index
@@ -700,6 +700,63 @@ Uds_DiagSessionControl_Packet.prototype.createFromUds_Packet = function (packet)
 }
 
 module.exports.Uds_DiagSessionControl_Packet = Uds_DiagSessionControl_Packet
+
+////////////////Packet: Uds_DiagSessionControlPosRes_Packet////////////////
+var Uds_DiagSessionControlPosRes_Packet = function (
+	source_addr,
+	target_addr,
+	request_sid,
+	type,
+	record) {
+	Uds_Packet.call(this,
+	source_addr,
+	target_addr,
+	request_sid)
+
+	this.type = type
+	this.record = record
+}
+Uds_DiagSessionControlPosRes_Packet.prototype.__proto__ = Uds_Packet.prototype
+Uds_DiagSessionControlPosRes_Packet.prototype.serialize = function (len = 0) {
+	var ele_len = len;
+	ele_len += 1
+	if (this.record != null) {
+		ele_len += this.record.length
+	}
+	Uds_Packet.prototype.serialize.call(this, ele_len)
+
+	var buffer = this.buffer;
+	var parse_index = this.parse_index
+
+	buffer.writeUInt8(this.type, parse_index)
+	parse_index += 1
+	if (this.record != null) {
+		this.record.copy(buffer, parse_index)
+		parse_index += this.record.length
+	}
+	this.parse_index = parse_index
+}
+Uds_DiagSessionControlPosRes_Packet.prototype.deserialize = function () {
+	var parse_index = this.parse_index
+	var buffer = this.buffer
+
+	this.type = buffer.readUInt8(parse_index)
+	parse_index += 1
+	if (parse_index < buffer.length) {
+        var buf_len = buffer.length - parse_index
+		this.record = Buffer.alloc(buf_len)
+		buffer.copy(this.record, 0, parse_index)
+		parse_index += this.record.length
+	}
+	this.parse_index = parse_index
+}
+Uds_DiagSessionControlPosRes_Packet.prototype.createFromUds_Packet = function (packet) {
+	Uds_DiagSessionControlPosRes_Packet.prototype.deserialize.call(packet)
+	packet.__proto__ = Uds_DiagSessionControlPosRes_Packet.prototype
+	return packet
+}
+
+module.exports.Uds_DiagSessionControlPosRes_Packet = Uds_DiagSessionControlPosRes_Packet
 
 ////////////////Packet: Uds_EcuReset_Packet////////////////
 var Uds_EcuReset_Packet = function (
@@ -773,7 +830,7 @@ Uds_EcuResetPosRes_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.reset_type, parse_index)
 	parse_index += 1
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -830,7 +887,7 @@ Uds_SecurityAccess_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.type, parse_index)
 	parse_index += 1
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -887,7 +944,7 @@ Uds_SecurityAccessPosRes_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.type, parse_index)
 	parse_index += 1
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -986,7 +1043,7 @@ Uds_ReadDataByIdPosRes_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt16BE(this.did, parse_index)
 	parse_index += 2
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1043,7 +1100,7 @@ Uds_WriteDataById_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt16BE(this.did, parse_index)
 	parse_index += 2
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1147,7 +1204,7 @@ Uds_RoutingControl_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt16BE(this.id, parse_index)
 	parse_index += 2
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1211,7 +1268,7 @@ Uds_RoutingControlPosRes_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt16BE(this.id, parse_index)
 	parse_index += 2
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1275,7 +1332,7 @@ Uds_RequestDownload_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.format_id, parse_index)
 	parse_index += 1
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1334,7 +1391,7 @@ Uds_RequestDownloadPosRes_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.format_id, parse_index)
 	parse_index += 1
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1391,7 +1448,7 @@ Uds_TransferData_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.block_cnt, parse_index)
 	parse_index += 1
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1448,7 +1505,7 @@ Uds_TransferDataPosRes_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.block_cnt, parse_index)
 	parse_index += 1
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1500,7 +1557,7 @@ Uds_RequestTransferExit_Packet.prototype.serialize = function (len = 0) {
 	var parse_index = this.parse_index
 
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1550,7 +1607,7 @@ Uds_RequestTransferExitPosRes_Packet.prototype.serialize = function (len = 0) {
 	var parse_index = this.parse_index
 
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1610,7 +1667,7 @@ Uds_RequestFileTransfer_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt16BE(this.filePathAndNameLength, parse_index)
 	parse_index += 2
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1674,7 +1731,7 @@ Uds_RequestFileTransferPosRes_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.lengthFormatIdentifier, parse_index)
 	parse_index += 1
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1817,7 +1874,7 @@ Uds_ReadDtc_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.reportType, parse_index)
 	parse_index += 1
 	if (this.buf != null) {
-		buffer.copy(this.buf, parse_index)
+		this.buf.copy(buffer, parse_index)
 		parse_index += this.buf.length
 	}
 	this.parse_index = parse_index
@@ -1918,7 +1975,7 @@ Uds_ControlDtc_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.type, parse_index)
 	parse_index += 1
 	if (this.record != null) {
-		buffer.copy(this.record, parse_index)
+		this.record.copy(buffer, parse_index)
 		parse_index += this.record.length
 	}
 	this.parse_index = parse_index
@@ -1980,7 +2037,7 @@ Uds_CommunicationControl_Packet.prototype.serialize = function (len = 0) {
 	buffer.writeUInt8(this.communicationType, parse_index)
 	parse_index += 1
 	if (this.nodeIdNumber != null) {
-		buffer.copy(this.nodeIdNumber, parse_index)
+		this.nodeIdNumber.copy(buffer, parse_index)
 		parse_index += this.nodeIdNumber.length
 	}
 	this.parse_index = parse_index

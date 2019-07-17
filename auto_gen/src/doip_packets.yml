@@ -152,6 +152,15 @@ packets:
           - name: record
             type: "std::vector<uint8_t>"
             length: 0
+    - name: Uds_DiagSessionControlPosRes_Packet
+      parent: Uds_Packet
+      elements:
+          - name: type
+            type: "uint8_t"
+            length: 1
+          - name: record
+            type: "std::vector<uint8_t>"
+            length: 0
     - name: Uds_EcuReset_Packet
       parent: Uds_Packet
       elements:

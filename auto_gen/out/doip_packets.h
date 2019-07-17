@@ -296,6 +296,28 @@ public:
     const uint32_t exp_payloadLength = 1 + 0;
 };
 /*
+ * Packet: Uds_DiagSessionControlPosRes_Packet
+ */
+
+class Uds_DiagSessionControlPosRes_Packet : public Uds_Packet
+{
+public:
+    Uds_DiagSessionControlPosRes_Packet(
+        uint16_t source_addr,
+        uint16_t target_addr,
+        uint8_t request_sid,
+        uint8_t type,
+        std::vector<uint8_t> &&record);
+    Uds_DiagSessionControlPosRes_Packet(Uds_DiagSessionControlPosRes_Packet &&packet);
+    Uds_DiagSessionControlPosRes_Packet(Uds_Packet &&packet);
+    virtual int deserialize(void);
+    virtual int serialize(void);
+
+    uint8_t type;
+    std::vector<uint8_t> record;
+    const uint32_t exp_payloadLength = 1 + 0;
+};
+/*
  * Packet: Uds_EcuReset_Packet
  */
 
