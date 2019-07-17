@@ -99,7 +99,7 @@ ${packet["name"]}.prototype.serialize = function (len = 0) {
 		% if element["type"]=="std::vector<uint8_t>" :
 			% if element["length"] == 0 :
 	if (this.${element["name"]} != null) {
-		buffer.copy(this.${element["name"]}, parse_index)
+		this.${element["name"]}.copy(buffer, parse_index)
 		parse_index += this.${element["name"]}.length
 	}
 			% else:
