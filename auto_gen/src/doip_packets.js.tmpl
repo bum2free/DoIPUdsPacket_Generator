@@ -77,6 +77,7 @@ var ${packet["name"]} = function (
   % if "payloadType" in packet:
     this.payloadType = ${packet["payloadType"]}
   % endif
+  return this
 }
 ${packet["name"]}.prototype.__proto__ = ${packet["parent"]}.prototype
 ${packet["name"]}.prototype.serialize = function (len = 0) {
@@ -118,6 +119,7 @@ ${packet["name"]}.prototype.serialize = function (len = 0) {
 		% endif
 	% endfor
 	this.parse_index = parse_index
+	return this
 }
 ${packet["name"]}.prototype.deserialize = function () {
 	var parse_index = this.parse_index
@@ -148,6 +150,7 @@ ${packet["name"]}.prototype.deserialize = function () {
 		% endif
 	% endfor
 	this.parse_index = parse_index
+	return this
 }
 ${packet["name"]}.prototype.createFrom${packet["parent"]} = function (packet) {
 	${packet["name"]}.prototype.deserialize.call(packet)
